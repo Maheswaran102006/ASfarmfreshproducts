@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AS Farm Fresh Products — Order Online</title>
+  <style>
+    :root{--green:#2d6a3a;--accent:#f7d46c;--bg:#fffdf8}
+    body{font-family: Arial, Helvetica, sans-serif;margin:0;background:#faf9f6;color:#222}
+    header{background:linear-gradient(180deg,#ffffff88, #f3f7f1);padding:18px 20px;display:flex;align-items:center;justify-content:center;position:relative}
+    header img.logo{height:64px;margin-right:14px;border-radius:8px}
+    header h1{font-family: 'Georgia', 'Times New Roman', Times, serif;margin:0;color:var(--green);font-size:28px}
+    nav{position:fixed;top:18px;left:18px}
+    nav a{display:block;background:var(--green);color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;margin-bottom:8px;font-weight:600}
+    .container{max-width:1100px;margin:28px auto;padding:0 16px}
+    .hero{background-image:url('assets/background.jpg');background-size:cover;background-position:center;border-radius:10px;padding:40px;color:#fff;display:flex;gap:24px}
+    .hero .intro{background:rgba(0,0,0,0.35);padding:22px;border-radius:8px;max-width:560px}
+    .hero h2{margin:0 0 8px;font-size:36px}
+    .hero p{margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:18px}
+    .card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(15,20,15,0.08)}
+    .card img{width:100%;height:180px;object-fit:cover}
+    .card .content{padding:12px}
+    .card h3{margin:0 0 6px}
+    .quote{font-style:italic;color:#555;margin-top:8px;padding:0 12px 12px}
+
+    /* Order Panel (simulates separate page) */
+    #orderPage{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px}
+    .order-panel{background:#fff;width:100%;max-width:720px;border-radius:10px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,0.25)}
+    .order-panel h2{margin-top:0}
+    .form-row{display:flex;gap:10px;margin-bottom:10px}
+    .form-row label{flex:1}
+    input[type=text],input[type=number],select,textarea{width:100%;padding:8px;border:1px solid #cfcfcf;border-radius:6px}
+    button{background:var(--green);color:#fff;padding:10px 14px;border:none;border-radius:6px;cursor:pointer}
+    .secondary{background:#666}
+
+    /* Invoice style */
+    .invoice{font-family: 'Times New Roman', Times, serif;background:linear-gradient(90deg, #fff6d6 0%, #ffffff 100%);padding:18px;border-radius:8px}
+    .invoice h3{margin:4px 0}
+    .invoice table{width:100%;border-collapse:collapse}
+    .invoice th,.invoice td{padding:8px;border-bottom:1px dashed #c9c9c9;text-align:left}
+
+    /* Posts/Admin */
+    #postsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+    .post{background:#fff;padding:8px;border-radius:8px}
+
+    footer{margin-top:28px;padding:18px;text-align:center;color:#444}
+
+    @media(max-width:800px){.grid{grid-template-columns:1fr}.hero{flex-direction:column}.form-row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="AS Farm Fresh Logo" class="logo" />
+    <h1>AS Fresh Farm Products</h1>
+  </header>
+
+  <nav>
+    <a href="#home" onclick="scrollToSection(event,'home')">Home</a>
+    <a href="#about" onclick="scrollToSection(event,'about')">About</a>
+    <a href="#posts" onclick="scrollToSection(event,'posts')">Posts</a>
+    <a href="#contact" onclick="scrollToSection(event,'contact')">Contact</a>
+    <a href="#order" id="openOrderBtn">Order / Pre-book</a>
+  </nav>
+
+  <main class="container" id="home">
+    <section class="hero">
+      <div class="intro">
+        <h2>Pure Buffalo Milk • Paneer • Ghee</h2>
+        <p>Traditional methods, farm-to-table transparency. Order fresh products directly from our farm.</p>
+        <p><strong>Contact:</strong> asfarmfresh01@gmail.com • +91 8056748395</p>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;justify-content:center">
+        <img src="assets/milk.png" alt="milk" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
+        <img src="assets/paneer.png" alt="paneer" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
+        <img src="assets/ghee.png" alt="ghee" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:18px">
+      <div class="card">
+        <img src="assets/milk.png" alt="Milk section background" />
+        <div class="content">
+          <h3>Buffalo Milk — ₹60 / L</h3>
+          <p class="quote">"Pure, wholesome, straight from our buffaloes — excellence in every drop."</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="assets/paneer.png" alt="Paneer section background" />
+        <div class="content">
+          <h3>Paneer — ₹150 / kg</h3>
+          <p class="quote">"Handmade paneer with a firm texture — perfect for all recipes."</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="assets/ghee.png" alt="Ghee section background" />
+        <div class="content">
+          <h3>Ghee — ₹400 / L</h3>
+          <p class="quote">"Traditionally clarified ghee — golden aroma and rich flavor."</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="posts" style="margin-top:26px">
+      <h2>Posts (Admin only)</h2>
+      <p>Admin can add images, video, or PDF (password protected). Posts appear here after upload.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <button onclick="openAdmin()">Admin Upload</button>
+        <button onclick="loadPosts()" class="secondary">Refresh Posts</button>
+      </div>
+      <div id="postsGrid"></div>
+    </section>
+
+    <section id="about" style="margin-top:26px">
+      <h2>About Farm</h2>
+      <p>AS Fresh Farm Products is located at North Street, Kasanadupudur, Thanjavur — we follow time-honored methods to produce paneer and ghee. Contact: asfarmfresh01@gmail.com</p>
+    </section>
+
+    <section id="contact" style="margin-top:26px">
+      <h2>Contact</h2>
+      <p>Address: North Street, Kasanadupudur, Thanjavur, 614904</p>
+      <p>Email: asfarmfresh01@gmail.com • Phone: +91 8056748395</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <small>© AS Fresh Farm Products — All rights reserved</small>
+  </footer>
+
+  <!-- Order / Pre-book Page (modal) -->
+  <div id="orderPage">
+    <div class="order-panel">
+      <h2 id="orderTitle">Place an Order</h2>
+      <form id="orderForm" onsubmit="return handleOrder(event)">
+        <div class="form-row">
+          <label>Customer name:<br/><input type="text" id="custName" required></label>
+          <label>Mobile number:<br/><input type="text" id="custMobile" placeholder="+91-XXXXXXXXXX" value="+91 8056748395" required></label>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:8px">
+          <label style="flex:1">Product:<br/>
+            <select id="product" onchange="updateUnitAndPrice()">
+              <option value="milk">Buffalo Milk</option>
+              <option value="paneer">Paneer</option>
+              <option value="ghee">Ghee</option>
+            </select>
+          </label>
+          <label style="flex:1">Unit:<br/>
+            <select id="unit">
+              <option value="l">Liters (L)</option>
+              <option value="ml">Milliliters (ml)</option>
+              <option value="kg">Kilogram (kg)</option>
+              <option value="g">Grams (g)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label style="flex:1">Quantity:<br/><input type="number" step="any" id="qty" value="1" required></label>
+          <label style="flex:1">Order type:<br/>
+            <select id="orderType">
+              <option value="order">Order Now</option>
+              <option value="prebook">Pre-book</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="margin-bottom:8px">Price per base unit shown below. GST (5%) will be added automatically in bill.</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <div style="flex:1">Base price: <strong id="basePrice">₹60 / L</strong></div>
+          <div style="flex:1">Calculated total: <strong id="calcTotal">₹0.00</strong></div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button type="submit">Place Order & Show Bill</button>
+          <button type="button" class="secondary" onclick="closeOrder()">Cancel</button>
+        </div>
+      </form>
+
+      <div id="invoiceWrap" style="display:none;margin-top:12px">
+        <div class="invoice" id="invoiceContent"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button onclick="printInvoice()">Download / Print Bill</button>
+          <button class="secondary" onclick="sendInvoice()">Send to Email & Mobile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin upload modal -->
+  <div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:18px">
+    <div style="background:#fff;padding:16px;border-radius:10px;max-width:720px;width:100%">
+      <h3>Admin Upload (password required)</h3>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="password" id="adminPass" placeholder="Enter password"/>
+        <button onclick="adminLogin()">Unlock</button>
+        <button onclick="closeAdmin()" class="secondary">Close</button>
+      </div>
+      <div id="adminArea" style="display:none">
+        <p>Upload image / video / pdf to create a post.</p>
+        <input type="file" id="postFile" accept="image/*,video/*,application/pdf" />
+        <br/><br/>
+        <input type="text" id="postTitle" placeholder="Post title / caption" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px" />
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button onclick="createPost()">Upload Post</button>
+          <button class="secondary" onclick="lockAdmin()">Lock & Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Pricing configuration (base prices) ---
+    const PRICES = {
+      milk: {perL:60},   // ₹ per liter
+      ghee: {perL:400},  // ₹ per liter
+      paneer: {perKg:150} // ₹ per kg
+    };
+
+    // Init
+    document.getElementById('openOrderBtn').addEventListener('click',openOrder);
+    document.getElementById('unit').addEventListener('change',calculate);
+    document.getElementById('qty').addEventListener('input',calculate);
+    document.getElementById('product').addEventListener('change',calculate);
+    updateUnitAndPrice();
+    loadPosts();
+
+    function scrollToSection(e,id){e.preventDefault();document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+
+    function openOrder(e){
+      document.getElementById('orderPage').style.display='flex';
+      document.getElementById('orderTitle').innerText='Place an Order / Pre-book';
+      calculate();
+    }
+    function closeOrder(){document.getElementById('orderPage').style.display='none';document.getElementById('invoiceWrap').style.display='none';}
+
+    function updateUnitAndPrice(){
+      const p = document.getElementById('product').value;
+      if(p==='milk'){ document.getElementById('unit').value='l'; document.getElementById('basePrice').innerText='₹'+PRICES.milk.perL+' / L'; }
+      if(p==='ghee'){ document.getElementById('unit').value='l'; document.getElementById('basePrice').innerText='₹'+PRICES.ghee.perL+' / L'; }
+      if(p==='paneer'){ document.getElementById('unit').value='kg'; document.getElementById('basePrice').innerText='₹'+PRICES.paneer.perKg+' / kg'; }
+      calculate();
+    }
+
+    function calculate(){
+      const product = document.getElementById('product').value;
+      const unit = document.getElementById('unit').value;
+      const qty = parseFloat(document.getElementById('qty').value)||0;
+      let total = 0;
+      if(product==='milk'){
+        const perMl = PRICES.milk.perL/1000; // ₹ per ml
+        if(unit==='l') total = qty * PRICES.milk.perL;
+        else if(unit==='ml') total = qty * perMl;
+        else total = qty * PRICES.milk.perL; // fallback
+      }
+      if(product==='ghee'){
+        const perMl = PRICES.ghee.perL/1000;
+        if(unit==='l') total = qty * PRICES.ghee.perL;
+        else if(unit==='ml') total = qty * perMl;
+        else total = qty * PRICES.ghee.perL;
+      }
+      if(product==='paneer'){
+        const perG = PRICES.paneer.perKg/1000;
+        if(unit==='kg') total = qty * PRICES.paneer.perKg;
+        else if(unit==='g') total = qty * perG;
+        else total = qty * PRICES.paneer.perKg;
+      }
+      document.getElementById('calcTotal').innerText = '₹' + total.toFixed(2);
+      return total;
+    }
+
+    // --- Handle order submission and invoice generation ---
+    function handleOrder(e){
+      e.preventDefault();
+      const name = document.getElementById('custName').value.trim();
+      const mobile = document.getElementById('custMobile').value.trim();
+      const product = document.getElementById('product').value;
+      const unit = document.getElementById('unit').value;
+      const qty = parseFloat(document.getElementById('qty').value)||0;
+      const orderType = document.getElementById('orderType').value;
+
+      const subtotal = calculate();
+      const gst = subtotal * 0.05; // 5% GST
+      const total = subtotal + gst;
+
+      // Build invoice HTML (Times New Roman, yellow & white)
+      const invoiceHTML = `
+        <div style="padding:8px">
+          <h3 style="margin:0">AS Fresh Farm Products — Invoice</h3>
+          <p style="margin:4px 0">Customer: ${escapeHTML(name)}<br/>Mobile: ${escapeHTML(mobile)}</p>
+          <table>
+            <tr><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>
+            <tr>
+              <td>${escapeHTML(product)}</td>
+              <td>${qty} ${unit}</td>
+              <td>₹${(subtotal/ (qty||1)).toFixed(2)}</td>
+              <td>₹${subtotal.toFixed(2)}</td>
+            </tr>
+            <tr><td colspan="3" style="text-align:right">GST (5%)</td><td>₹${gst.toFixed(2)}</td></tr>
+            <tr><td colspan="3" style="text-align:right"><strong>Total</strong></td><td><strong>₹${total.toFixed(2)}</strong></td></tr>
+          </table>
+          <p style="margin-top:8px">Order Type: ${orderType}</p>
+          <p style="margin:0;font-size:12px">Thank you for ordering from AS Fresh Farm Products.</p>
+        </div>
+      `;
+
+      const invoiceWrap = document.getElementById('invoiceWrap');
+      const invoiceContent = document.getElementById('invoiceContent');
+      invoiceContent.innerHTML = invoiceHTML;
+      invoiceWrap.style.display='block';
+
+      // Save last invoice to localStorage so admin or owner can view later
+      const invObj = {name, mobile, product, unit, qty, subtotal, gst, total, date: new Date().toISOString()};
+      const history = JSON.parse(localStorage.getItem('orders')||'[]');
+      history.push(invObj);
+      localStorage.setItem('orders', JSON.stringify(history));
+
+      // show message about email/sms (we cannot send automatically from client-only site)
+      alert('Invoice prepared. Use "Send to Email & Mobile" to open your mail client / SMS app (this will not automatically send without a server).');
+      return false;
+    }
+
+    function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+    function printInvoice(){
+      const content = document.getElementById('invoiceContent').innerHTML;
+      const w = window.open('','_blank','width=700,height=900');
+      w.document.write('<html><head><title>Invoice</title>');
+      w.document.write('<style>body{font-family: "Times New Roman", Times, serif;background:linear-gradient(90deg,#fff6d6,#ffffff);padding:18px} table{width:100%;border-collapse:collapse} th,td{padding:8px;text-align:left;border-bottom:1px dashed #c9c9c9}</style>');
+      w.document.write('</head><body>');
+      w.document.write(content);
+      w.document.write('</body></html>');
+      w.document.close();
+      w.print();
+    }
+
+    function sendInvoice(){
+      // open mailto with invoice summary and sms: link for mobile
+      const history = JSON.parse(localStorage.getItem('orders')||'[]');
+      const last = history[history.length-1];
+      if(!last){alert('No invoice found — please place an order first.');return}
+      const body = `Invoice from AS Fresh Farm\nCustomer: ${last.name}\nMobile: ${last.mobile}\nProduct: ${last.product} ${last.qty}${last.unit}\nTotal: ₹${last.total.toFixed(2)} (incl. GST)`;
+      // mailto
+      const mailto = `mailto:asfarmfresh01@gmail.com?subject=${encodeURIComponent('New Order Invoice')}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
+      // For SMS — this will open SMS app on supporting devices
+      const smsLink = `sms:${last.mobile.replace(/\s+/g,'')};?&body=${encodeURIComponent(body)}`;
+      setTimeout(()=>{window.location.href = smsLink},600);
+    }
+
+    // --- Admin upload logic (client-only, stores posts in localStorage) ---
+    const ADMIN_PASS = 'asfarm8056';
+    function openAdmin(){document.getElementById('adminModal').style.display='flex';}
+    function closeAdmin(){document.getElementById('adminModal').style.display='none'}
+    function adminLogin(){
+      const p = document.getElementById('adminPass').value||'';
+      if(p===ADMIN_PASS){document.getElementById('adminArea').style.display='block';alert('Admin unlocked — you may upload posts.');}
+      else{alert('Incorrect password.')}
+    }
+    function lockAdmin(){document.getElementById('adminArea').style.display='none';document.getElementById('adminPass').value='';alert('Admin locked.');}
+
+    async function createPost(){
+      const fileInput = document.getElementById('postFile');
+      const title = document.getElementById('postTitle').value||'';
+      if(!fileInput.files.length){alert('Choose a file to upload.');return}
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function(evt){
+        const data = evt.target.result; // base64
+        const posts = JSON.parse(localStorage.getItem('posts')||'[]');
+        posts.unshift({title, type:file.type, data, date:new Date().toISOString()});
+        localStorage.setItem('posts', JSON.stringify(posts));
+        fileInput.value='';document.getElementById('postTitle').value='';
+        alert('Post uploaded to local storage. Refresh posts to view.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadPosts(){
+      const posts = JSON.parse(localStorage.getItem('posts')||'[]');
+      const grid = document.getElementById('postsGrid');grid.innerHTML='';
+      if(!posts.length){ grid.innerHTML='<div style="padding:12px;background:#fff;border-radius:8px">No posts yet. You can upload from Admin (password required).</div>'; return }
+      posts.forEach(p=>{
+        const div = document.createElement('div');div.className='post';
+        div.innerHTML = `<strong>${escapeHTML(p.title||'Untitled')}</strong><br/><small>${new Date(p.date).toLocaleString()}</small><div style="margin-top:8px"></div>`;
+        if(p.type.startsWith('image/')){ const img = document.createElement('img'); img.src=p.data; img.style.width='100%'; img.style.borderRadius='6px'; div.appendChild(img);} 
+        else if(p.type.startsWith('video/')){ const v = document.createElement('video'); v.src=p.data; v.controls=true; v.style.width='100%'; div.appendChild(v);} 
+        else if(p.type==='application/pdf'){ const a = document.createElement('a'); a.href=p.data; a.textContent='View PDF'; a.target='_blank'; div.appendChild(a);} 
+        grid.appendChild(div);
+      })
+    }
+
+    function adminLogout(){ localStorage.removeItem('admin'); lockAdmin(); }
+
+  </script>
+</body>
+</html>
