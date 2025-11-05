@@ -1,487 +1,573 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>AS Fresh Farm Products — Order Online</title>
 <style>
-:root{--green:#2d6a3a;--accent:#f7d46c;}
+:root{--green:#2d6a3a;--accent:#f7d46c;--muted:#666}
+*{box-sizing:border-box}
 body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#faf9f6;color:#222}
-header{background:linear-gradient(180deg,#f7d46c,#fff7cc);border-bottom:2px solid #e0c25f;padding:18px 20px;display:flex;align-items:center;justify-content:center;position:relative}
-header img{height:64px;margin-right:12px;border-radius:8px}
-header h1{font-family:'Times New Roman',serif;margin:0;color:#2d6a3a;font-size:30px}
-.hamburger{position:fixed;top:14px;left:14px;z-index:1200}
-.hamburger button{background:none;border:none;font-size:26px;cursor:pointer}
-.nav-menu{position:fixed;top:60px;left:14px;background:#fff;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.12);display:none;padding:8px;z-index:1300}
-.nav-menu a{display:block;padding:8px 12px;color:#2d6a3a;font-weight:bold;text-decoration:none;border-radius:6px}
-.nav-menu a:hover{background:#f7d46c}
-.container{max-width:1000px;margin:28px auto;padding:0 16px}
-.hero{background:url('assets/background.jpg')center/cover;border-radius:10px;padding:40px;color:#fff;display:flex;gap:24px}
-.hero .intro{background:rgba(0,0,0,0.45);padding:22px;border-radius:8px;max-width:520px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:18px}
-.card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
-.card img{width:100%;height:180px;object-fit:cover}
-.card .content{padding:12px}
-.card h3{margin:0 0 6px}
-.quote{font-style:italic;color:#555;margin-top:8px;padding:0 12px 12px}
-#orderPage{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1500}
-.order-panel{background:#fff;width:100%;max-width:760px;border-radius:10px;padding:20px;position:relative}
-.form-row{display:flex;gap:10px;margin-bottom:10px}
-.form-row label{flex:1}
-input[type=text],input[type=number],select{width:100%;padding:8px;border:1px solid #cfcfcf;border-radius:6px}
-button{background:var(--green);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
-button.secondary{background:#666}
-.close-btn{position:absolute;top:10px;right:14px;background:none;border:none;font-size:26px;cursor:pointer}
-.invoice{font-family:'Times New Roman',serif;background:linear-gradient(90deg,#fff6d6,#ffffff);padding:16px;border-radius:8px}
-.invoice table{width:100%;border-collapse:collapse}
-.invoice th,.invoice td{padding:6px;border-bottom:1px dashed #ccc;text-align:left}
-#adminModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1500}
-.admin-box{background:#fff;padding:16px;border-radius:8px;max-width:720px;width:100%;position:relative}
-#postsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
-.post{background:#fff;padding:8px;border-radius:8px}
-footer{margin-top:26px;text-align:center;padding:14px;color:#555}
-@media(max-width:700px){.hero{flex-direction:column}.form-row{flex-direction:column}}
+header{background:linear-gradient(180deg,var(--accent),#fff7cc);border-bottom:2px solid #e0c25f;padding:12px 16px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:1400}
+header img{height:56px;border-radius:8px;margin-right:12px}
+.header-title{font-family:'Times New Roman',serif;margin:0;color:var(--green);font-size:22px}
+.hamburger{position:absolute;left:12px}
+.hamburger button{background:none;border:none;font-size:24px;cursor:pointer}
+.container{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:1fr 360px;gap:18px}
+@media(max-width:960px){.container{grid-template-columns:1fr}}
+.hero{background:url('assets/background.jpg')center/cover;border-radius:10px;padding:20px;color:#fff;display:flex;gap:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:18px}
+.card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.08);display:flex;flex-direction:column}
+.card img{width:100%;height:160px;object-fit:cover}
+.card .content{padding:12px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.card h3{margin:0 0 6px;font-size:16px}
+.price{font-weight:bold;color:var(--green)}
+.product-controls{display:flex;align-items:center;gap:8px;margin-top:10px}
+.qty-btn{width:34px;height:34px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+.add-btn{background:var(--green);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+.small{font-size:13px;color:var(--muted)}
+
+/* Flipkart-like order drawer / summary */
+.order-summary{background:#fff;border-radius:8px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,0.08);position:sticky;top:88px;height:fit-content}
+.order-summary h3{margin:0 0 8px}
+.order-items{max-height:420px;overflow:auto;margin-bottom:8px}
+.order-row{display:flex;gap:8px;align-items:center;padding:8px;border-radius:6px;border:1px solid #f0efe6;margin-bottom:8px}
+.order-row img{width:64px;height:64px;object-fit:cover;border-radius:6px}
+.order-row .meta{flex:1}
+.row-controls{display:flex;align-items:center;gap:6px}
+.summary-line{display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #eee}
+.total-line{display:flex;justify-content:space-between;padding:10px 0;font-weight:bold}
+.checkout-btn{width:100%;background:var(--green);color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:16px}
+.clear-btn{width:100%;background:#f1f1f1;color:#333;border:none;padding:8px;border-radius:6px;cursor:pointer}
+
+/* drawer for mobile */
+.drawer{position:fixed;right:0;top:0;bottom:0;width:100%;max-width:420px;background:#fff;box-shadow:-12px 0 40px rgba(0,0,0,0.2);transform:translateX(110%);transition:transform .28s ease;z-index:1600;padding:14px;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.close-drawer{align-self:flex-end;background:none;border:none;font-size:26px;cursor:pointer}
+
+/* small screens */
+@media(max-width:960px){
+  .order-summary{display:none}
+  .container{padding-bottom:90px}
+}
+
+/* invoice print style */
+.invoice{font-family:'Times New Roman',serif;background:linear-gradient(90deg,#fff6d6,#ffffff);padding:12px;border-radius:8px}
 </style>
 </head>
 <body>
 
 <header>
+  <div class="hamburger"><button id="hambBtn">☰</button></div>
   <img src="assets/logo.jpeg" alt="AS Farm Fresh Logo"/>
-  <h1>AS Fresh Farm Products</h1>
+  <h1 class="header-title">AS Fresh Farm Products</h1>
 </header>
 
-<div class="hamburger">
-  <button id="hambBtn">☰</button>
-  <div class="nav-menu" id="navMenu">
-    <a href="#home" data-target="home">Home</a>
-    <a href="#about" data-target="about">About</a>
-    <a href="#posts" data-target="posts">Posts</a>
-    <a href="#contact" data-target="contact">Contact</a>
-    <a href="#" id="openOrderBtn">Order / Pre-book</a>
-  </div>
-</div>
-
-<main class="container" id="home">
-  <section class="hero">
-    <div class="intro">
-      <h2>Pure Buffalo Milk • Paneer • Ghee</h2>
-      <p>Farm-fresh, preservative-free dairy products directly from our farm.</p>
-      <p><strong>Contact:</strong> asfarmfresh01@gmail.com • +91 8056748395</p>
-    </div>
-    <div style="flex:1;display:flex;flex-direction:column;gap:10px;justify-content:center">
-      <img src="assets/milk.png" alt="milk" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
-      <img src="assets/paneer.png" alt="paneer" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
-      <img src="assets/ghee.png" alt="ghee" style="max-height:120px;object-fit:contain;background:#fff;padding:8px;border-radius:8px"/>
-    </div>
-  </section>
-
-  <section class="grid">
-    <div class="card"><img src="assets/milk.png"><div class="content"><h3>Buffalo Milk — ₹50 / L</h3><p class="quote">“Wholesome purity in every drop.”</p></div></div>
-    <div class="card"><img src="assets/paneer.png"><div class="content"><h3>Paneer — ₹150 / kg</h3><p class="quote">“Soft and fresh, made with love.”</p></div></div>
-    <div class="card"><img src="assets/ghee.png"><div class="content"><h3>Ghee — ₹400 / L</h3><p class="quote">“Golden flavor, pure buffalo butterfat.”</p></div></div>
-  </section>
-
-  <section id="posts" style="margin-top:26px">
-    <h2>Posts (Admin only)</h2>
-    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <button onclick="openAdmin()">Admin Upload</button>
-      <button onclick="loadPosts()" class="secondary">Refresh Posts</button>
-    </div>
-    <div id="postsGrid"></div>
-  </section>
-
-  <section id="about" style="margin-top:26px">
-    <h2>About</h2>
-    <p>Located at North Street, Kasanadupudur, Thanjavur — we ensure sustainable and ethical dairy farming with traditional processing.</p>
-  </section>
-
-  <section id="contact" style="margin-top:26px">
-    <h2>Contact</h2>
-    <p>Email: asfarmfresh01@gmail.com</p>
-    <p>Phone: +91 8056748395</p>
-  </section>
-</main>
-
-<footer>© AS Fresh Farm Products — All rights reserved</footer>
-
-<!-- Order Modal -->
-<div id="orderPage">
-  <div class="order-panel" role="dialog" aria-modal="true">
-    <button class="close-btn" onclick="closeOrder()">×</button>
-    <h2>Place Order / Pre-book</h2>
-
-    <div class="form-row">
-      <label>Customer name:<br><input type="text" id="custName" required></label>
-      <label>Mobile number:<br><input type="text" id="custMobile" value="+91 8056748395" required></label>
-    </div>
-
-    <div class="form-row">
-      <label>Product:<br>
-        <select id="product" onchange="updateUnitAndPrice()">
-          <option value="milk">Buffalo Milk</option>
-          <option value="paneer">Paneer</option>
-          <option value="ghee">Ghee</option>
-        </select>
-      </label>
-
-      <label>Unit:<br>
-        <select id="unit" onchange="calculate()">
-          <option value="l">Liters (L)</option>
-          <option value="ml">Milliliters (ml)</option>
-          <option value="kg">Kilograms (kg)</option>
-          <option value="g">Grams (g)</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="form-row">
-      <label>Quantity:<br><input type="number" id="qty" value="1" min="0.01" step="any" oninput="calculate()"></label>
-      <label>Order type:<br>
-        <select id="orderType">
-          <option value="order">Order Now</option>
-          <option value="prebook">Pre-book</option>
-        </select>
-      </label>
-    </div>
-
-    <div style="margin-bottom:8px">Base price: <strong id="basePrice">₹50 / L</strong></div>
-    <div style="margin-bottom:8px">Calculated total (excl. GST): <strong id="calcTotal">₹0.00</strong></div>
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button onclick="placeOrder()">Place Order & Send Bill</button>
-      <button class="secondary" onclick="closeOrder()">Cancel</button>
-    </div>
-
-    <div id="invoiceWrap" style="display:none;margin-top:12px">
-      <div class="invoice" id="invoiceContent"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="printInvoice()">Download / Print Bill</button>
-        <button class="secondary" onclick="resendInvoice()">Resend Email</button>
+<main class="container">
+  <section>
+    <div class="hero">
+      <div style="flex:1">
+        <h2 style="margin:0 0 6px">Pure Buffalo Milk • Paneer • Ghee</h2>
+        <p style="margin:0 0 6px">Farm-fresh, preservative-free dairy products directly from our farm.</p>
+        <p style="margin:0"><strong>Contact:</strong> asfarmfresh01@gmail.com • +91 8056748395</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <img src="assets/milk.png" alt="milk" style="height:80px;background:#fff;padding:8px;border-radius:8px">
       </div>
     </div>
+
+    <section style="margin-top:18px">
+      <h3>Products</h3>
+      <div class="grid" id="productsGrid"></div>
+    </section>
+
+    <section id="posts" style="margin-top:26px">
+      <h3>Posts (Admin)</h3>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button onclick="openAdmin()">Admin Upload</button>
+        <button onclick="loadPosts()">Refresh Posts</button>
+      </div>
+      <div id="postsGrid"></div>
+    </section>
+
+    <section id="about" style="margin-top:26px">
+      <h3>About</h3>
+      <p>Located at North Street, Kasanadupudur, Thanjavur — sustainable & ethical dairy farming.</p>
+    </section>
+  </section>
+
+  <!-- desktop summary -->
+  <aside class="order-summary" id="orderSummary">
+    <h3>Order Summary</h3>
+    <div id="orderItems" class="order-items"><div class="small">No items yet — add products to start.</div></div>
+
+    <div class="summary-line"><div>Subtotal</div><div id="subtotal">₹0.00</div></div>
+    <div class="summary-line"><div>GST (5%)</div><div id="gst">₹0.00</div></div>
+    <div class="summary-line"><div>Delivery</div><div id="delivery">₹0.00</div></div>
+    <div class="total-line"><div>Total</div><div id="total">₹0.00</div></div>
+
+    <div style="margin-top:8px">
+      <button class="checkout-btn" onclick="openCheckout()">Place Order</button>
+      <button class="clear-btn" onclick="clearCart()" style="margin-top:8px">Clear</button>
+    </div>
+    <div style="margin-top:8px;font-size:13px;color:var(--muted)">Orders are emailed automatically to <strong>asfarmfresh01@gmail.com</strong> when you complete checkout (configure EmailJS or Formspree below).</div>
+  </aside>
+</main>
+
+<!-- Checkout drawer / modal (mobile & desktop) -->
+<div id="checkoutDrawer" class="drawer" aria-hidden="true">
+  <button class="close-drawer" onclick="closeCheckout()">×</button>
+  <h3>Checkout — AS Fresh Farm Products</h3>
+
+  <div id="drawerItems" style="margin:8px 0;max-height:220px;overflow:auto"></div>
+
+  <div style="margin-top:8px">
+    <label>Customer name:<br><input type="text" id="custName" placeholder="Name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>
   </div>
+  <div style="margin-top:8px">
+    <label>Mobile number:<br><input type="text" id="custMobile" placeholder="+91 9xxxxxxxxx" value="+91 8056748395" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>
+  </div>
+
+  <div style="margin-top:8px">
+    <label>Delivery address:<br><textarea id="custAddress" rows="3" placeholder="Flat / House, Street, Landmark, City, PIN" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></textarea></label>
+  </div>
+
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <label style="flex:1">Payment method:<br>
+      <select id="paymentMethod" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px">
+        <option value="cod">Cash on delivery</option>
+        <option value="upi">UPI / Transfer</option>
+      </select>
+    </label>
+    <label style="flex:1">Order type:<br>
+      <select id="orderType" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px">
+        <option value="order">Order Now</option>
+        <option value="prebook">Pre-book</option>
+      </select>
+    </label>
+  </div>
+
+  <div style="margin-top:8px" id="checkoutSummary">
+    <div class="summary-line"><div>Subtotal</div><div id="subtotal2">₹0.00</div></div>
+    <div class="summary-line"><div>GST (5%)</div><div id="gst2">₹0.00</div></div>
+    <div class="total-line"><div>Total</div><div id="total2">₹0.00</div></div>
+  </div>
+
+  <div style="margin-top:10px;display:flex;gap:8px">
+    <button class="checkout-btn" onclick="confirmAndSend()">Confirm & Pay / Send</button>
+    <button class="clear-btn" onclick="closeCheckout()">Cancel</button>
+  </div>
+
+  <div id="invoiceWrap" style="display:none;margin-top:12px">
+    <div class="invoice" id="invoiceContent"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="printInvoice()">Download / Print Bill</button>
+      <button class="clear-btn" onclick="resendInvoice()">Resend Email</button>
+    </div>
+  </div>
+
+  <div style="height:28px"></div>
 </div>
 
-<!-- Admin Modal -->
-<div id="adminModal">
-  <div class="admin-box">
-    <button class="close-btn" onclick="closeAdmin()">×</button>
+<!-- Admin modal (unchanged logic) -->
+<div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1700">
+  <div style="background:#fff;padding:16px;border-radius:8px;max-width:720px;width:100%;position:relative">
+    <button onclick="closeAdmin()" style="position:absolute;right:10px;top:8px;background:none;border:none;font-size:22px">×</button>
     <h3>Admin Upload (password required)</h3>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <input type="password" id="adminPass" placeholder="Enter password">
       <button onclick="adminLogin()">Unlock</button>
-      <button class="secondary" onclick="closeAdmin()">Close</button>
+      <button onclick="closeAdmin()">Close</button>
     </div>
-
     <div id="adminArea" style="display:none">
       <p>Upload image / video / pdf to create a post.</p>
       <input type="file" id="postFile" accept="image/*,video/*,application/pdf" />
       <input type="text" id="postTitle" placeholder="Post title / caption" style="width:100%;margin-top:8px"/>
       <div style="margin-top:8px;display:flex;gap:8px">
         <button onclick="createPost()">Upload Post</button>
-        <button class="secondary" onclick="lockAdmin()">Lock</button>
+        <button onclick="lockAdmin()">Lock</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- EmailJS library will be loaded dynamically by the script below -->
+<footer style="text-align:center;padding:14px;color:#555">© AS Fresh Farm Products — All rights reserved</footer>
+
 <script>
-/* ============================
-   Configuration (EDIT THESE)
+/* ===========================
+  CONFIG - EDIT THESE
+   - To send email automatically you must configure either:
+     A) EmailJS: set EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY
+        - create a template that uses the fields below (see comments)
+     B) OR Formspree (or other webhook): set FORM_ENDPOINT (a URL that accepts POST JSON or form data)
+   - If both set, EmailJS is used first. If neither set, email will NOT be sent automatically.
+   - Email will always be sent TO the farm email address: asfarmfresh01@gmail.com (embedded in template params).
    ============================ */
-const FARM_EMAIL = 'asfarmfresh01@gmail.com'; // receives invoice
-const FARM_MOBILE = '+918056748395';          // included in email body
+
+const FARM_EMAIL = 'asfarmfresh01@gmail.com';
+const FARM_MOBILE = '+918056748395';
 const ADMIN_PASSWORD = 'asfarm8056';
 
-// Replace the three EmailJS placeholders with your real EmailJS values:
-const EMAILJS_SERVICE_ID = 'YOUR_EMAILJS_SERVICE_ID';      // e.g. 'service_xxx'
-const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';   // e.g. 'template_xxx'
-const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';     // e.g. 'user_xxx'
+// EmailJS placeholders (replace with your actual EmailJS values)
+const EMAILJS_SERVICE_ID = 'YOUR_EMAILJS_SERVICE_ID';      // example: 'service_xxx'
+const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';  // example: 'template_xxx'
+const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';    // example: 'user_xxx'
 
-// Optional: email-to-sms gateway (if you have carrier gateway)
-// const SMS_EMAIL_TO = '918056748395@smsgateway.example';
-const SMS_EMAIL_TO = '';
+// Formspree or webhook endpoint (alternative). If you want Formspree: create a form and use the endpoint from them.
+// Example Formspree endpoint style: https://formspree.io/f/yourformid
+const FORM_ENDPOINT = ''; // e.g. 'https://formspree.io/f/xxxxxx' OR a Make/Webhook URL
 
-/* ============================
-   Pricing (per liter / per kg)
+/* ===========================
+   PRODUCTS (prices)
    ============================ */
-const PRICES = {
-  milk: { perL: 60 },
-  ghee: { perL: 400 },
-  paneer: { perKg: 150 }
-};
+const PRODUCTS = [
+  { id:'milk', title:'Buffalo Milk', pricePerL:60, img:'assets/milk.png', unit:'L' },
+  { id:'paneer', title:'Paneer', pricePerKg:150, img:'assets/paneer.png', unit:'kg' },
+  { id:'ghee', title:'Ghee', pricePerL:400, img:'assets/ghee.png', unit:'L' }
+];
 
-/* ============================
-   Utils & initialization
+let cart = {}; // {id:{qty,unit,rate,title}}
+const GST_RATE = 0.05;
+const DELIVERY_CHARGE = 0; // set if you charge delivery
+
+/* ===========================
+   Initialize UI & EmailJS script loader
    ============================ */
-document.addEventListener('DOMContentLoaded', function() {
-  // Hamburger menu logic
-  const hamb = document.getElementById('hambBtn');
-  const menu = document.getElementById('navMenu');
-  hamb.addEventListener('click', e => { e.stopPropagation(); menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; });
-  document.addEventListener('click', e => { if (!menu.contains(e.target) && !hamb.contains(e.target)) menu.style.display = 'none'; });
-  document.querySelectorAll('.nav-menu a[data-target]').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const id = a.getAttribute('data-target');
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-      menu.style.display = 'none';
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  renderProducts();
+  restoreCart();
+  updateSummaryUI();
+
+  // menu hamburger (keeps previous behavior)
+  document.getElementById('hambBtn').addEventListener('click', () => {
+    const m = document.querySelector('.nav-menu');
+    if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
   });
 
-  // Wire controls
-  document.getElementById('openOrderBtn').addEventListener('click', openOrder);
-  updateUnitAndPrice();
-  calculate();
-  loadPosts();
-
-  // Load EmailJS library and init
-  const s = document.createElement('script');
-  s.src = "https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js";
-  s.onload = function() {
-    if (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
-      emailjs.init(EMAILJS_PUBLIC_KEY);
-      console.log('EmailJS initialized');
-    } else {
-      console.log('EmailJS loaded but not initialized (replace public key in config).');
-    }
-  };
-  document.head.appendChild(s);
-
-  // Close modals on Esc
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllPopups(); });
+  // load EmailJS library if placeholders are set (won't initialize if key is placeholder)
+  if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+    const s = document.createElement('script');
+    s.src = "https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js";
+    s.onload = () => {
+      if (window.emailjs) {
+        try { emailjs.init(EMAILJS_PUBLIC_KEY); console.log('EmailJS initialized'); }
+        catch(e){ console.warn('EmailJS init failed', e); }
+      }
+    };
+    document.head.appendChild(s);
+  }
 });
 
-/* ============================
-   Modal helpers
+/* ===========================
+   Render products grid (with qty inputs)
    ============================ */
-function closeAllPopups() { closeOrder(); closeAdmin(); }
-function openOrder(){ document.getElementById('orderPage').style.display = 'flex'; }
-function closeOrder(){ document.getElementById('orderPage').style.display = 'none'; document.getElementById('invoiceWrap').style.display = 'none'; }
-function openAdmin(){ document.getElementById('adminModal').style.display = 'flex'; }
-function closeAdmin(){ document.getElementById('adminModal').style.display = 'none'; }
-function lockAdmin(){ document.getElementById('adminArea').style.display = 'none'; document.getElementById('adminPass').value=''; }
-
-/* ============================
-   Admin posts (client-side)
-   ============================ */
-function adminLogin(){
-  const p = document.getElementById('adminPass').value || '';
-  if (p === ADMIN_PASSWORD) {
-    document.getElementById('adminArea').style.display = 'block'; alert('Admin unlocked — you may upload posts.');
-  } else alert('Incorrect password');
-}
-function createPost(){
-  const fileInput = document.getElementById('postFile');
-  const title = document.getElementById('postTitle').value || '';
-  if (!fileInput.files.length) { alert('Choose a file to upload.'); return; }
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-  reader.onload = function(evt){
-    const data = evt.target.result;
-    const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-    posts.unshift({ title, type: file.type, data, date: new Date().toISOString() });
-    localStorage.setItem('posts', JSON.stringify(posts));
-    alert('Post uploaded.');
-    loadPosts();
-  };
-  reader.readAsDataURL(file);
-}
-function loadPosts(){
-  const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-  const grid = document.getElementById('postsGrid'); grid.innerHTML = '';
-  if (!posts.length) { grid.innerHTML = '<div style="padding:12px;background:#fff;border-radius:8px">No posts yet.</div>'; return; }
-  posts.forEach(p => {
-    const div = document.createElement('div'); div.className = 'post';
-    div.innerHTML = `<strong>${escapeHTML(p.title || 'Untitled')}</strong><br/><small>${new Date(p.date).toLocaleString()}</small>`;
-    if (p.type.startsWith('image/')) { const img = document.createElement('img'); img.src = p.data; img.style.width='100%'; img.style.borderRadius='6px'; div.appendChild(img); }
-    else if (p.type.startsWith('video/')) { const v = document.createElement('video'); v.src=p.data; v.controls=true; v.style.width='100%'; div.appendChild(v); }
-    else if (p.type === 'application/pdf') { const a = document.createElement('a'); a.href=p.data; a.target='_blank'; a.textContent='View PDF'; div.appendChild(a); }
+function renderProducts(){
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
+  PRODUCTS.forEach(p => {
+    const div = document.createElement('div'); div.className='card';
+    div.innerHTML = `
+      <img src="${p.img}" alt="${p.title}">
+      <div class="content">
+        <div>
+          <h3>${p.title}</h3>
+          <div class="small">₹${(p.pricePerL||p.pricePerKg||p.pricePerKg).toFixed(0)} / ${p.unit}</div>
+          <div class="product-controls" style="margin-top:8px">
+            <button class="qty-btn" onclick="decrease('${p.id}')">−</button>
+            <input id="qty-${p.id}" type="number" min="0" step="any" value="${getQtyFromCart(p.id)||0}" style="width:70px;padding:6px;border:1px solid #ddd;border-radius:6px">
+            <button class="qty-btn" onclick="increase('${p.id}')">+</button>
+            <button class="add-btn" style="margin-left:auto" onclick="addFromInput('${p.id}')">Add</button>
+          </div>
+        </div>
+        <div class="small" style="margin-top:8px">Fresh daily from our farm.</div>
+      </div>
+    `;
     grid.appendChild(div);
+
+    // wire input change
+    const inp = div.querySelector(`#qty-${p.id}`);
+    inp.addEventListener('change', () => {
+      const val = parseFloat(inp.value)||0;
+      updateCartQty(p.id, val);
+    });
   });
 }
 
-/* ============================
-   Pricing & calculation
+/* ===========================
+   Cart helpers
    ============================ */
-function updateUnitAndPrice(){
-  const p = document.getElementById('product').value;
-  if (p === 'milk') { document.getElementById('unit').value = 'l'; document.getElementById('basePrice').innerText = '₹' + PRICES.milk.perL + ' / L'; }
-  else if (p === 'ghee') { document.getElementById('unit').value = 'l'; document.getElementById('basePrice').innerText = '₹' + PRICES.ghee.perL + ' / L'; }
-  else if (p === 'paneer') { document.getElementById('unit').value = 'kg'; document.getElementById('basePrice').innerText = '₹' + PRICES.paneer.perKg + ' / kg'; }
-  calculate();
-}
-
-function calculate(){
-  const product = document.getElementById('product').value;
-  const unit = document.getElementById('unit').value;
-  const qty = parseFloat(document.getElementById('qty').value) || 0;
-  let subtotal = 0;
-  if (product === 'milk') {
-    const perMl = PRICES.milk.perL / 1000;
-    subtotal = unit === 'l' ? qty * PRICES.milk.perL : unit === 'ml' ? qty * perMl : qty * PRICES.milk.perL;
-  } else if (product === 'ghee') {
-    const perMl = PRICES.ghee.perL / 1000;
-    subtotal = unit === 'l' ? qty * PRICES.ghee.perL : unit === 'ml' ? qty * perMl : qty * PRICES.ghee.perL;
-  } else if (product === 'paneer') {
-    const perG = PRICES.paneer.perKg / 1000;
-    subtotal = unit === 'kg' ? qty * PRICES.paneer.perKg : unit === 'g' ? qty * perG : qty * PRICES.paneer.perKg;
+function getQtyFromCart(id){ return cart[id] ? cart[id].qty : 0; }
+function increase(id){ const cur = getQtyFromCart(id)||0; updateCartQty(id, +(cur + 0.25).toFixed(2)); }
+function decrease(id){ const cur = getQtyFromCart(id)||0; updateCartQty(id, Math.max(0, +(cur - 0.25).toFixed(2))); }
+function addFromInput(id){ const v = parseFloat(document.getElementById('qty-'+id).value)||0; if (!v){ alert('Enter quantity > 0'); return; } updateCartQty(id,v); alert('Added/updated'); }
+function updateCartQty(id, qty){
+  if (qty <= 0) { delete cart[id]; } else {
+    const p = PRODUCTS.find(x=>x.id===id);
+    const rate = p.pricePerL || p.pricePerKg || 0;
+    cart[id] = { qty, unit: p.unit, rate, title: p.title };
   }
-  document.getElementById('calcTotal').innerText = '₹' + subtotal.toFixed(2);
-  return subtotal;
+  saveCart();
+  updateSummaryUI();
+}
+function removeFromCart(id){ delete cart[id]; saveCart(); updateSummaryUI(); }
+function clearCart(){ cart = {}; saveCart(); updateSummaryUI(); }
+
+/* localStorage */
+function saveCart(){ localStorage.setItem('cart', JSON.stringify(cart)); }
+function restoreCart(){ cart = JSON.parse(localStorage.getItem('cart')||'{}'); }
+
+/* ===========================
+   Summary / UI update
+   ============================ */
+function computeTotals(){
+  let subtotal = 0;
+  Object.keys(cart).forEach(id => {
+    const it = cart[id];
+    subtotal += (it.rate||0) * (it.qty||0);
+  });
+  const gst = +(subtotal * GST_RATE).toFixed(2);
+  const total = +(subtotal + gst + DELIVERY_CHARGE).toFixed(2);
+  return {subtotal:+subtotal.toFixed(2), gst, delivery:DELIVERY_CHARGE, total};
 }
 
-/* ============================
-   Invoice generation and EmailJS send
+function updateSummaryUI(){
+  const {subtotal,gst,delivery,total} = computeTotals();
+  // desktop elements
+  document.getElementById('orderItems').innerHTML = '';
+  if (Object.keys(cart).length === 0){
+    document.getElementById('orderItems').innerHTML = '<div class="small">No items yet — add products to start.</div>';
+  } else {
+    Object.keys(cart).forEach(id => {
+      const it = cart[id];
+      const row = document.createElement('div'); row.className='order-row';
+      const p = PRODUCTS.find(x=>x.id===id);
+      row.innerHTML = `
+        <img src="${p.img}" alt="${p.title}">
+        <div class="meta">
+          <strong>${it.title}</strong>
+          <div class="small">Qty: ${it.qty} ${it.unit}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:bold">₹${(it.rate*it.qty).toFixed(2)}</div>
+          <div class="row-controls" style="margin-top:6px">
+            <button class="qty-btn" onclick="decrease('${id}')">−</button>
+            <button class="qty-btn" onclick="increase('${id}')">+</button>
+            <button class="clear-btn" onclick="removeFromCart('${id}')">Del</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('orderItems').appendChild(row);
+    });
+  }
+  // numbers
+  document.getElementById('subtotal').innerText = `₹${subtotal.toFixed(2)}`;
+  document.getElementById('gst').innerText = `₹${gst.toFixed(2)}`;
+  document.getElementById('delivery').innerText = `₹${delivery.toFixed(2)}`;
+  document.getElementById('total').innerText = `₹${total.toFixed(2)}`;
+
+  // drawer copy
+  document.getElementById('drawerItems').innerHTML = buildDrawerItemsHTML();
+  document.getElementById('subtotal2').innerText = `₹${subtotal.toFixed(2)}`;
+  document.getElementById('gst2').innerText = `₹${gst.toFixed(2)}`;
+  document.getElementById('total2').innerText = `₹${total.toFixed(2)}`;
+}
+
+/* build HTML for drawer items */
+function buildDrawerItemsHTML(){
+  if (Object.keys(cart).length === 0) return '<div class="small">No items in cart</div>';
+  let html = '';
+  Object.keys(cart).forEach(id => {
+    const it = cart[id];
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px dashed #eee">
+      <div style="flex:1"><strong>${it.title}</strong><div class="small">Qty: ${it.qty} ${it.unit}</div></div>
+      <div style="text-align:right">₹${(it.rate*it.qty).toFixed(2)}</div>
+    </div>`;
+  });
+  return html;
+}
+
+/* ===========================
+   Checkout drawer controls
    ============================ */
-function placeOrder(){
-  // validate
+function openCheckout(){ document.getElementById('checkoutDrawer').classList.add('open'); document.getElementById('checkoutDrawer').setAttribute('aria-hidden','false'); }
+function closeCheckout(){ document.getElementById('checkoutDrawer').classList.remove('open'); document.getElementById('checkoutDrawer').setAttribute('aria-hidden','true'); }
+
+/* ===========================
+   Confirm order: build order object, send email (EmailJS or Formspree), open WhatsApp
+   ============================ */
+async function confirmAndSend(){
   const name = document.getElementById('custName').value.trim();
   const mobile = document.getElementById('custMobile').value.trim();
-  if (!name || !mobile) { alert('Please enter name and mobile number'); return; }
-
-  const product = document.getElementById('product').value;
-  const unit = document.getElementById('unit').value;
-  const qty = parseFloat(document.getElementById('qty').value) || 0;
+  const address = document.getElementById('custAddress').value.trim();
+  const payment = document.getElementById('paymentMethod').value;
   const orderType = document.getElementById('orderType').value;
-  const subtotal = calculate();
-  const gst = +(subtotal * 0.05).toFixed(2);
-  const total = +(subtotal + gst).toFixed(2);
 
-  // Build invoice HTML for display/print (Times New Roman, yellow-white)
-  const invoiceHTML = `
-    <div>
-      <h3 style="margin:0">AS Fresh Farm Products — Invoice</h3>
-      <p style="margin:6px 0">Customer: ${escapeHTML(name)}<br/>Mobile: ${escapeHTML(mobile)}<br/>Date: ${new Date().toLocaleString()}</p>
-      <table style="width:100%;border-collapse:collapse">
-        <tr><th style="text-align:left;padding:6px">Product</th><th style="padding:6px">Qty</th><th style="padding:6px">Rate</th><th style="padding:6px">Amount</th></tr>
-        <tr>
-          <td style="padding:6px">${escapeHTML(product)}</td>
-          <td style="padding:6px">${qty} ${unit}</td>
-          <td style="padding:6px">₹${( (product==='paneer') ? (PRICES.paneer.perKg) : (product==='milk'?PRICES.milk.perL:PRICES.ghee.perL) ).toFixed(2)}</td>
-          <td style="padding:6px">₹${subtotal.toFixed(2)}</td>
-        </tr>
-        <tr><td colspan="3" style="text-align:right;padding:6px">GST (5%)</td><td style="padding:6px">₹${gst.toFixed(2)}</td></tr>
-        <tr><td colspan="3" style="text-align:right;padding:6px"><strong>Total</strong></td><td style="padding:6px"><strong>₹${total.toFixed(2)}</strong></td></tr>
-      </table>
-      <p style="margin-top:8px">Order Type: ${escapeHTML(orderType)}</p>
-      <p style="margin:0;font-size:12px">Thank you for ordering from AS Fresh Farm Products.</p>
-    </div>
-  `;
+  if (!name || !mobile || !address){ alert('Please enter name, mobile and delivery address'); return; }
+  if (Object.keys(cart).length === 0){ alert('Cart is empty'); return; }
 
-  // show invoice and save order locally
-  document.getElementById('invoiceContent').innerHTML = invoiceHTML;
-  document.getElementById('invoiceWrap').style.display = 'block';
-  const orderObj = { name, mobile, product, unit, qty, subtotal, gst, total, orderType, date: new Date().toISOString() };
-  const history = JSON.parse(localStorage.getItem('orders') || '[]'); history.push(orderObj); localStorage.setItem('orders', JSON.stringify(history));
-
-  // Send invoice by EmailJS automatically
-  sendInvoiceByEmail(orderObj).then(() => {
-    alert('Invoice sent to farm email.');
-    // Send WhatsApp to farm and customer
-    sendBillToWhatsApp(orderObj);
-  }).catch(err => {
-    console.error('Email send failed', err);
-    alert('Invoice created, but automatic email failed. Check EmailJS configuration or click "Resend Email".');
-    // still attempt WhatsApp
-    sendBillToWhatsApp(orderObj);
+  const totals = computeTotals();
+  const items = Object.keys(cart).map(id=>{
+    const it = cart[id]; return { id, title: it.title, qty: it.qty, unit: it.unit, rate: it.rate, amount: +(it.rate*it.qty).toFixed(2) };
   });
-}
 
-/* Resend button uses the last saved order */
-function resendInvoice(){
-  const history = JSON.parse(localStorage.getItem('orders') || '[]');
-  if (!history.length) { alert('No invoice to resend.'); return; }
-  const last = history[history.length - 1];
-  sendInvoiceByEmail(last).then(()=>{ alert('Invoice resent to farm email.'); }).catch(err=>{ console.error(err); alert('Resend failed.'); });
-}
-
-/* Build template params and send using EmailJS */
-async function sendInvoiceByEmail(order){
-  // Basic validation for EmailJS config
-  if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY ||
-      EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') {
-    return Promise.reject(new Error('EmailJS not configured — replace placeholders in the code.'));
-  }
-
-  const templateParams = {
+  const order = {
     farm_email: FARM_EMAIL,
     farm_mobile: FARM_MOBILE,
-    customer_name: order.name,
-    customer_mobile: order.mobile,
-    product: order.product,
-    qty: order.qty + ' ' + order.unit,
-    subtotal: order.subtotal.toFixed(2),
-    gst: order.gst.toFixed(2),
-    total: order.total.toFixed(2),
-    order_date: (new Date(order.date)).toLocaleString()
+    customer_name: name,
+    customer_mobile: mobile,
+    customer_address: address,
+    payment_method: payment,
+    order_type: orderType,
+    items,
+    subtotal: totals.subtotal,
+    gst: totals.gst,
+    delivery: totals.delivery,
+    total: totals.total,
+    date_iso: new Date().toISOString()
   };
 
-  // Send email (primary)
-  await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+  // show invoice preview
+  document.getElementById('invoiceWrap').style.display = 'block';
+  document.getElementById('invoiceContent').innerHTML = buildInvoiceHTML(order);
 
-  // Optionally send to SMS gateway email if configured
-  if (typeof SMS_EMAIL_TO === 'string' && SMS_EMAIL_TO.trim()) {
-    const smsParams = Object.assign({}, templateParams, { to_email: SMS_EMAIL_TO });
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, smsParams);
+  // save to orders history
+  const history = JSON.parse(localStorage.getItem('orders') || '[]');
+  history.push(order);
+  localStorage.setItem('orders', JSON.stringify(history));
+
+  // Attempt sending via EmailJS if configured, otherwise try FORM endpoint, otherwise fail gracefully
+  try {
+    if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' &&
+        EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+      await sendViaEmailJS(order);
+      alert('Order emailed to farm successfully (EmailJS).');
+    } else if (FORM_ENDPOINT && FORM_ENDPOINT.trim()) {
+      await sendViaFormEndpoint(order);
+      alert('Order sent to farm successfully (Form endpoint).');
+    } else {
+      throw new Error('No email method configured. Please configure EmailJS or FORM_ENDPOINT in script.');
+    }
+
+    // open WhatsApp for farm and customer
+    sendToWhatsApp(order);
+    closeCheckout();
+    clearCart();
+    updateSummaryUI();
+  } catch (err) {
+    console.error('Send failed:', err);
+    alert('Order generated but automatic email failed. Check configuration. The invoice is shown — you can print it or resend later.');
   }
-  return Promise.resolve();
 }
 
-/* ============================
-   WhatsApp auto-send integration
+/* ===========================
+   Email senders
+   ============================ */
+
+async function sendViaEmailJS(order){
+  // build template params - make sure your EmailJS template accepts these field names
+  const templateParams = {
+    farm_email: order.farm_email,
+    farm_mobile: order.farm_mobile,
+    customer_name: order.customer_name,
+    customer_mobile: order.customer_mobile,
+    customer_address: order.customer_address,
+    payment_method: order.payment_method,
+    order_type: order.order_type,
+    subtotal: order.subtotal.toFixed(2),
+    gst: order.gst.toFixed(2),
+    delivery: order.delivery.toFixed(2),
+    total: order.total.toFixed(2),
+    order_date: new Date(order.date_iso).toLocaleString(),
+    order_items: order.items.map(i=>`${i.title} x ${i.qty} ${i.unit} = ₹${i.amount.toFixed(2)}`).join('\n')
+  };
+
+  // require emailjs loaded and initialized
+  if (!window.emailjs) throw new Error('EmailJS library not loaded');
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+}
+
+async function sendViaFormEndpoint(order){
+  // POST as JSON — set up your webhook to accept JSON
+  const payload = {
+    farm_email: order.farm_email,
+    farm_mobile: order.farm_mobile,
+    customer_name: order.customer_name,
+    customer_mobile: order.customer_mobile,
+    customer_address: order.customer_address,
+    payment_method: order.payment_method,
+    order_type: order.order_type,
+    items: order.items,
+    subtotal: order.subtotal,
+    gst: order.gst,
+    delivery: order.delivery,
+    total: order.total,
+    order_date: new Date(order.date_iso).toLocaleString()
+  };
+
+  const res = await fetch(FORM_ENDPOINT, {
+    method:'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error('Form endpoint error: ' + res.status + ' ' + text);
+  }
+  return res;
+}
+
+/* ===========================
+   WhatsApp integration (opens chat)
    ============================ */
 function normalizePhone(number){
-  // keep only digits and leading + (if present), return digits only (no +)
   if (!number) return '';
   const digits = String(number).replace(/\D/g,'');
   return digits;
 }
-
-function buildWhatsAppMessage(order){
-  const billDate = new Date(order.date).toLocaleString();
-  return `🧾 AS FARM FRESH BILL
-Customer: ${order.name}
-Mobile: ${order.mobile}
-Product: ${order.product}
-Quantity: ${order.qty} ${order.unit}
-Subtotal: ₹${order.subtotal.toFixed(2)}
-GST (5%): ₹${order.gst.toFixed(2)}
-Total: ₹${order.total.toFixed(2)}
-Date: ${billDate}
-
-✅ Sent automatically from AS FARM FRESH Website`;
-}
-
-function sendBillToWhatsApp(order){
+function sendToWhatsApp(order){
   try {
-    const msg = buildWhatsAppMessage(order);
-    // Send to farm
-    const farmNumber = normalizePhone(FARM_MOBILE); // e.g. 918056748395
-    if (farmNumber) {
-      const farmUrl = `https://wa.me/${farmNumber}?text=${encodeURIComponent(msg)}`;
-      window.open(farmUrl, "_blank");
-    }
-    // Send to customer (if they entered a number)
-    const custNumber = normalizePhone(order.mobile);
-    // If customer provided only local 10-digit without country, try to add '91' if it's 10 digits
-    let custNumberFinal = custNumber;
-    if (custNumber && custNumber.length === 10) custNumberFinal = '91' + custNumber;
-    if (custNumberFinal && custNumberFinal.length >= 10) {
-      const custUrl = `https://wa.me/${custNumberFinal}?text=${encodeURIComponent(msg)}`;
-      // open customer WA in a new tab as well
-      window.open(custUrl, "_blank");
-    }
-  } catch (err) {
-    console.error("WhatsApp send failed:", err);
-  }
+    const itemsText = order.items.map(i=>`${i.title} (${i.qty} ${i.unit}) - ₹${i.amount.toFixed(2)}`).join('\n');
+    const msg = `🧾 AS FARM FRESH ORDER
+Customer: ${order.customer_name}
+Mobile: ${order.customer_mobile}
+Address: ${order.customer_address}
+Items:
+${itemsText}
+Subtotal: ₹${order.subtotal.toFixed(2)}
+GST: ₹${order.gst.toFixed(2)}
+Total: ₹${order.total.toFixed(2)}
+Date: ${new Date(order.date_iso).toLocaleString()}`;
+    // farm
+    const farmNum = normalizePhone(order.farm_mobile);
+    if (farmNum) window.open(`https://wa.me/${farmNum}?text=${encodeURIComponent(msg)}`, '_blank');
+    // customer (if number present)
+    let cust = normalizePhone(order.customer_mobile);
+    if (cust.length === 10) cust = '91'+cust;
+    if (cust) window.open(`https://wa.me/${cust}?text=${encodeURIComponent('Your order has been placed. We will contact you shortly.\n\n'+ msg)}`, '_blank');
+  } catch(e){ console.error('WA failed', e); }
 }
 
-/* ============================
-   Print helper
+/* ===========================
+   Invoice HTML + print
    ============================ */
+function buildInvoiceHTML(order){
+  const rows = order.items.map(it => `<tr><td style="padding:6px">${escapeHTML(it.title)}</td><td style="padding:6px">${it.qty} ${it.unit}</td><td style="padding:6px">₹${it.rate.toFixed(2)}</td><td style="padding:6px">₹${it.amount.toFixed(2)}</td></tr>`).join('');
+  return `
+    <div>
+      <h3 style="margin:0">AS Fresh Farm Products — Invoice</h3>
+      <p style="margin:6px 0">Customer: ${escapeHTML(order.customer_name)}<br/>Mobile: ${escapeHTML(order.customer_mobile)}<br/>Address: ${escapeHTML(order.customer_address)}<br/>Date: ${new Date(order.date_iso).toLocaleString()}</p>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><th style="text-align:left;padding:6px">Product</th><th style="padding:6px">Qty</th><th style="padding:6px">Rate</th><th style="padding:6px">Amount</th></tr>
+        ${rows}
+        <tr><td colspan="3" style="text-align:right;padding:6px">GST (5%)</td><td style="padding:6px">₹${order.gst.toFixed(2)}</td></tr>
+        <tr><td colspan="3" style="text-align:right;padding:6px"><strong>Total</strong></td><td style="padding:6px"><strong>₹${order.total.toFixed(2)}</strong></td></tr>
+      </table>
+      <p style="margin-top:8px">Payment method: ${escapeHTML(order.payment_method)} — Order type: ${escapeHTML(order.order_type)}</p>
+      <p style="margin:0;font-size:12px">Thank you for ordering from AS Fresh Farm Products.</p>
+    </div>
+  `;
+}
+
 function printInvoice(){
   const content = document.getElementById('invoiceContent').innerHTML;
   const w = window.open('','_blank','width=700,height=900');
@@ -494,11 +580,73 @@ function printInvoice(){
   w.print();
 }
 
-/* ============================
-   Small helpers
+/* Resend last invoice */
+function resendInvoice(){
+  const history = JSON.parse(localStorage.getItem('orders') || '[]');
+  if (!history.length){ alert('No invoice to resend'); return; }
+  const last = history[history.length-1];
+  // try email send again
+  // adapt last object shape to expected 'order' format
+  const order = last;
+  (async()=>{
+    try{
+      if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+        await sendViaEmailJS(order);
+        alert('Resent via EmailJS');
+      } else if (FORM_ENDPOINT && FORM_ENDPOINT.trim()) {
+        await sendViaFormEndpoint(order);
+        alert('Resent via form endpoint');
+      } else alert('No email sender configured.');
+    }catch(e){ console.error(e); alert('Resend failed'); }
+  })();
+}
+
+/* ===========================
+   Posts & Admin (same as before)
+   ============================ */
+function openAdmin(){ document.getElementById('adminModal').style.display='flex'; }
+function closeAdmin(){ document.getElementById('adminModal').style.display='none'; }
+function lockAdmin(){ document.getElementById('adminArea').style.display='none'; document.getElementById('adminPass').value=''; }
+function adminLogin(){
+  const p = document.getElementById('adminPass').value || '';
+  if (p === ADMIN_PASSWORD) { document.getElementById('adminArea').style.display='block'; alert('Admin unlocked — you may upload posts.'); }
+  else alert('Incorrect password');
+}
+function createPost(){
+  const fileInput = document.getElementById('postFile');
+  const title = document.getElementById('postTitle').value || '';
+  if (!fileInput.files.length){ alert('Choose a file'); return; }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const data = evt.target.result;
+    const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+    posts.unshift({ title, type: file.type, data, date: new Date().toISOString() });
+    localStorage.setItem('posts', JSON.stringify(posts));
+    alert('Post uploaded');
+    loadPosts();
+  };
+  reader.readAsDataURL(file);
+}
+function loadPosts(){
+  const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+  const grid = document.getElementById('postsGrid'); grid.innerHTML = '';
+  if (!posts.length){ grid.innerHTML = '<div style="padding:12px;background:#fff;border-radius:8px">No posts yet.</div>'; return; }
+  posts.forEach(p=>{
+    const d = document.createElement('div'); d.className='card post'; d.style.padding='8px';
+    d.innerHTML = `<strong>${escapeHTML(p.title||'Untitled')}</strong><br/><small>${new Date(p.date).toLocaleString()}</small>`;
+    if (p.type.startsWith('image/')) { const img=document.createElement('img'); img.src=p.data; img.style.width='100%'; img.style.borderRadius='6px'; d.appendChild(img); }
+    else if (p.type.startsWith('video/')) { const v=document.createElement('video'); v.src=p.data; v.controls=true; v.style.width='100%'; d.appendChild(v); }
+    else if (p.type==='application/pdf') { const a=document.createElement('a'); a.href=p.data; a.target='_blank'; a.textContent='View PDF'; d.appendChild(a); }
+    grid.appendChild(d);
+  });
+}
+
+/* ===========================
+   Utility
    ============================ */
 function escapeHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
+restoreCart(); updateSummaryUI();
 </script>
 </body>
 </html>
