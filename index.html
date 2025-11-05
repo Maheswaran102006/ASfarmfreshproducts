@@ -45,6 +45,10 @@ header img{height:56px;border-radius:8px;margin-right:12px}
 .drawer.open{transform:translateX(0)}
 .close-drawer{align-self:flex-end;background:none;border:none;font-size:26px;cursor:pointer}
 
+/* nav menu (hamburger) */
+.nav-menu{display:none;position:fixed;top:64px;left:12px;background:#fff;padding:8px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:1600}
+.nav-menu a{display:block;padding:8px 12px;color:#2d6a3a;text-decoration:none;font-weight:bold}
+
 /* small screens */
 @media(max-width:960px){
   .order-summary{display:none}
@@ -58,12 +62,21 @@ header img{height:56px;border-radius:8px;margin-right:12px}
 <body>
 
 <header>
-  <div class="hamburger"><button id="hambBtn">☰</button></div>
+  <div class="hamburger"><button id="hambBtn" aria-label="Open menu">☰</button></div>
   <img src="assets/logo.jpeg" alt="AS Farm Fresh Logo"/>
   <h1 class="header-title">AS Fresh Farm Products</h1>
 </header>
 
-<main class="container">
+<!-- Nav menu used by the hamburger -->
+<nav id="navMenu" class="nav-menu" aria-label="Main menu">
+  <a href="#home" data-target="home">Home</a>
+  <a href="#about" data-target="about">About</a>
+  <a href="#posts" data-target="posts">Posts</a>
+  <a href="#contact" data-target="contact">Contact</a>
+  <a href="#" id="openOrderBtn">Order / Pre-book</a>
+</nav>
+
+<main class="container" id="home">
   <section>
     <div class="hero">
       <div style="flex:1">
@@ -93,6 +106,12 @@ header img{height:56px;border-radius:8px;margin-right:12px}
     <section id="about" style="margin-top:26px">
       <h3>About</h3>
       <p>Located at North Street, Kasanadupudur, Thanjavur — sustainable & ethical dairy farming.</p>
+    </section>
+
+    <section id="contact" style="margin-top:26px">
+      <h3>Contact</h3>
+      <p>Email: asfarmfresh01@gmail.com</p>
+      <p>Phone: +91 8056748395</p>
     </section>
   </section>
 
@@ -198,24 +217,21 @@ header img{height:56px;border-radius:8px;margin-right:12px}
   CONFIG - EDIT THESE
    - To send email automatically you must configure either:
      A) EmailJS: set EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY
-        - create a template that uses the fields below (see comments)
-     B) OR Formspree (or other webhook): set FORM_ENDPOINT (a URL that accepts POST JSON or form data)
-   - If both set, EmailJS is used first. If neither set, email will NOT be sent automatically.
-   - Email will always be sent TO the farm email address: asfarmfresh01@gmail.com (embedded in template params).
+     B) OR FORM_ENDPOINT (webhook/Formspree)
+   - If both set, EmailJS is used first. If neither set, email will open mail client (mailto) as fallback.
    ============================ */
 
 const FARM_EMAIL = 'asfarmfresh01@gmail.com';
 const FARM_MOBILE = '+918056748395';
 const ADMIN_PASSWORD = 'asfarm8056';
 
-// EmailJS placeholders (replace with your actual EmailJS values)
-const EMAILJS_SERVICE_ID = 'YOUR_EMAILJS_SERVICE_ID';      // example: 'service_xxx'
-const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';  // example: 'template_xxx'
-const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';    // example: 'user_xxx'
+// Replace these with your EmailJS credentials to enable automatic email sending via EmailJS.
+const EMAILJS_SERVICE_ID = 'YOUR_EMAILJS_SERVICE_ID';      // e.g. 'service_xxx'
+const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';   // e.g. 'template_xxx'
+const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';     // e.g. 'user_xxx'
 
-// Formspree or webhook endpoint (alternative). If you want Formspree: create a form and use the endpoint from them.
-// Example Formspree endpoint style: https://formspree.io/f/yourformid
-const FORM_ENDPOINT = ''; // e.g. 'https://formspree.io/f/xxxxxx' OR a Make/Webhook URL
+// OR set FORM_ENDPOINT to a webhook (Formspree/Make/Node endpoint)
+const FORM_ENDPOINT = ''; // e.g. 'https://formspree.io/f/xxxxxx' or your webhook URL
 
 /* ===========================
    PRODUCTS (prices)
@@ -231,31 +247,82 @@ const GST_RATE = 0.05;
 const DELIVERY_CHARGE = 0; // set if you charge delivery
 
 /* ===========================
-   Initialize UI & EmailJS script loader
+   Load EmailJS lib if keys set
+   ============================ */
+(function loadEmailJSIfConfigured(){
+  if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+    const s = document.createElement('script');
+    s.src = "https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js";
+    s.onload = () => {
+      try { if (window.emailjs) { emailjs.init(EMAILJS_PUBLIC_KEY); console.log('EmailJS initialized'); } }
+      catch(e){ console.warn('EmailJS init failed', e); }
+    };
+    s.onerror = (e) => { console.warn('Failed to load EmailJS script', e); };
+    document.head.appendChild(s);
+  } else {
+    console.log('EmailJS not configured (placeholders present).');
+  }
+})();
+
+/* ===========================
+   Initialize UI
    ============================ */
 document.addEventListener('DOMContentLoaded', () => {
   renderProducts();
   restoreCart();
   updateSummaryUI();
 
-  // menu hamburger (keeps previous behavior)
-  document.getElementById('hambBtn').addEventListener('click', () => {
-    const m = document.querySelector('.nav-menu');
-    if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
-  });
+  // wire openOrderBtn in nav menu
+  const openOrderBtn = document.getElementById('openOrderBtn');
+  if (openOrderBtn) openOrderBtn.addEventListener('click', (e)=>{ e.preventDefault(); openCheckout(); document.getElementById('navMenu').style.display='none'; });
 
-  // load EmailJS library if placeholders are set (won't initialize if key is placeholder)
-  if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
-    const s = document.createElement('script');
-    s.src = "https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js";
-    s.onload = () => {
-      if (window.emailjs) {
-        try { emailjs.init(EMAILJS_PUBLIC_KEY); console.log('EmailJS initialized'); }
-        catch(e){ console.warn('EmailJS init failed', e); }
-      }
-    };
-    document.head.appendChild(s);
-  }
+  // Robust hamburger/menu wiring
+  (function wireHamburger(){
+    const hamb = document.getElementById('hambBtn');
+    const menu = document.getElementById('navMenu');
+
+    if (!hamb) console.warn('Hamburger button (#hambBtn) not found');
+    if (!menu) console.warn('Nav menu (#navMenu) not found');
+
+    function openMenu(){ if (!menu) return; menu.style.display = 'block'; hamb.setAttribute('aria-expanded','true'); }
+    function closeMenu(){ if (!menu) return; menu.style.display = 'none'; hamb.setAttribute('aria-expanded','false'); }
+    function toggleMenu(){ if (!menu) return; menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; hamb.setAttribute('aria-expanded', (menu.style.display==='block').toString()); }
+
+    if (hamb) {
+      hamb.addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleMenu();
+      });
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', function(e){
+      if (!menu) return;
+      if (menu.style.display !== 'block') return;
+      if (menu.contains(e.target) || (hamb && hamb.contains(e.target))) return;
+      closeMenu();
+    }, { capture:true });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // Wire nav links (smooth scroll and close)
+    if (menu) {
+      menu.querySelectorAll('a[data-target]').forEach(a => {
+        a.addEventListener('click', function(ev){
+          ev.preventDefault();
+          closeMenu();
+          const id = a.getAttribute('data-target');
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({behavior:'smooth'});
+        });
+      });
+    }
+
+    console.log('Hamburger/menu wiring initialized');
+  })();
 });
 
 /* ===========================
@@ -393,7 +460,106 @@ function openCheckout(){ document.getElementById('checkoutDrawer').classList.add
 function closeCheckout(){ document.getElementById('checkoutDrawer').classList.remove('open'); document.getElementById('checkoutDrawer').setAttribute('aria-hidden','true'); }
 
 /* ===========================
-   Confirm order: build order object, send email (EmailJS or Formspree), open WhatsApp
+   Unified sendOrderEmail (EmailJS -> FORM_ENDPOINT -> mailto fallback)
+   ============================ */
+async function sendOrderEmail(order){
+  const mailSubject = `New order — AS Fresh Farm Products — ${new Date(order.date_iso).toLocaleString()}`;
+  const itemsText = (order.items || []).map(i => `${i.title} x ${i.qty} ${i.unit} = ₹${i.amount.toFixed(2)}`).join('\n');
+  const mailBody = `AS Fresh Farm Products - New order
+
+Customer: ${order.customer_name}
+Mobile: ${order.customer_mobile}
+Address: ${order.customer_address}
+
+Items:
+${itemsText}
+
+Subtotal: ₹${order.subtotal.toFixed(2)}
+GST: ₹${order.gst.toFixed(2)}
+Delivery: ₹${order.delivery.toFixed(2)}
+Total: ₹${order.total.toFixed(2)}
+
+Order date: ${new Date(order.date_iso).toLocaleString()}
+
+Payment method: ${order.payment_method}
+Order type: ${order.order_type}
+`;
+
+  // 1) Try EmailJS
+  try {
+    if (window.emailjs && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+      console.log('Attempting to send via EmailJS...');
+      const templateParams = {
+        farm_email: order.farm_email,
+        farm_mobile: order.farm_mobile,
+        customer_name: order.customer_name,
+        customer_mobile: order.customer_mobile,
+        customer_address: order.customer_address,
+        payment_method: order.payment_method,
+        order_type: order.order_type,
+        order_items: itemsText,
+        subtotal: order.subtotal.toFixed(2),
+        gst: order.gst.toFixed(2),
+        delivery: order.delivery.toFixed(2),
+        total: order.total.toFixed(2),
+        order_date: new Date(order.date_iso).toLocaleString()
+      };
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+      console.log('EmailJS send succeeded');
+      return { method: 'emailjs' };
+    }
+  } catch (e) {
+    console.warn('EmailJS send failed:', e);
+  }
+
+  // 2) Try FORM_ENDPOINT webhook
+  try {
+    if (FORM_ENDPOINT && FORM_ENDPOINT.trim()) {
+      console.log('Attempting to send via FORM_ENDPOINT...');
+      const res = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          farm_email: order.farm_email,
+          farm_mobile: order.farm_mobile,
+          customer_name: order.customer_name,
+          customer_mobile: order.customer_mobile,
+          customer_address: order.customer_address,
+          payment_method: order.payment_method,
+          order_type: order.order_type,
+          items: order.items,
+          subtotal: order.subtotal,
+          gst: order.gst,
+          delivery: order.delivery,
+          total: order.total,
+          order_date: new Date(order.date_iso).toLocaleString()
+        })
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(()=>'(no body)');
+        throw new Error('Form endpoint returned ' + res.status + ': ' + txt);
+      }
+      console.log('Form endpoint send succeeded');
+      return { method: 'form' };
+    }
+  } catch (e) {
+    console.warn('FORM_ENDPOINT send failed:', e);
+  }
+
+  // 3) Fallback: open default mail client (mailto)
+  try {
+    const mailtoLink = `mailto:${encodeURIComponent(order.farm_email)}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+    window.open(mailtoLink, '_blank');
+    console.log('Fell back to mailto: link (opened compose window).');
+    return { method: 'mailto' };
+  } catch (e) {
+    console.error('Fallback mailto failed', e);
+    throw new Error('All email methods failed');
+  }
+}
+
+/* ===========================
+   Confirm order: build order object, send email, open WhatsApp
    ============================ */
 async function confirmAndSend(){
   const name = document.getElementById('custName').value.trim();
@@ -435,85 +601,29 @@ async function confirmAndSend(){
   history.push(order);
   localStorage.setItem('orders', JSON.stringify(history));
 
-  // Attempt sending via EmailJS if configured, otherwise try FORM endpoint, otherwise fail gracefully
+  // send email (EmailJS -> FORM_ENDPOINT -> mailto fallback)
   try {
-    if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' &&
-        EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
-      await sendViaEmailJS(order);
-      alert('Order emailed to farm successfully (EmailJS).');
-    } else if (FORM_ENDPOINT && FORM_ENDPOINT.trim()) {
-      await sendViaFormEndpoint(order);
-      alert('Order sent to farm successfully (Form endpoint).');
-    } else {
-      throw new Error('No email method configured. Please configure EmailJS or FORM_ENDPOINT in script.');
-    }
-
-    // open WhatsApp for farm and customer
+    await sendOrderEmail(order);
+    alert('Order processed — check your email (or mail client) for details.');
     sendToWhatsApp(order);
     closeCheckout();
     clearCart();
     updateSummaryUI();
   } catch (err) {
     console.error('Send failed:', err);
-    alert('Order generated but automatic email failed. Check configuration. The invoice is shown — you can print it or resend later.');
+    alert('Order generated but automatic email failed. Invoice is shown; you can print or resend later.');
   }
 }
 
 /* ===========================
-   Email senders
+   EmailJS-specific helpers (kept for resend compatibility)
    ============================ */
-
 async function sendViaEmailJS(order){
-  // build template params - make sure your EmailJS template accepts these field names
-  const templateParams = {
-    farm_email: order.farm_email,
-    farm_mobile: order.farm_mobile,
-    customer_name: order.customer_name,
-    customer_mobile: order.customer_mobile,
-    customer_address: order.customer_address,
-    payment_method: order.payment_method,
-    order_type: order.order_type,
-    subtotal: order.subtotal.toFixed(2),
-    gst: order.gst.toFixed(2),
-    delivery: order.delivery.toFixed(2),
-    total: order.total.toFixed(2),
-    order_date: new Date(order.date_iso).toLocaleString(),
-    order_items: order.items.map(i=>`${i.title} x ${i.qty} ${i.unit} = ₹${i.amount.toFixed(2)}`).join('\n')
-  };
-
-  // require emailjs loaded and initialized
-  if (!window.emailjs) throw new Error('EmailJS library not loaded');
-  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+  // convenience wrapper (not used directly if unified sender used)
+  return sendOrderEmail(order);
 }
-
 async function sendViaFormEndpoint(order){
-  // POST as JSON — set up your webhook to accept JSON
-  const payload = {
-    farm_email: order.farm_email,
-    farm_mobile: order.farm_mobile,
-    customer_name: order.customer_name,
-    customer_mobile: order.customer_mobile,
-    customer_address: order.customer_address,
-    payment_method: order.payment_method,
-    order_type: order.order_type,
-    items: order.items,
-    subtotal: order.subtotal,
-    gst: order.gst,
-    delivery: order.delivery,
-    total: order.total,
-    order_date: new Date(order.date_iso).toLocaleString()
-  };
-
-  const res = await fetch(FORM_ENDPOINT, {
-    method:'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error('Form endpoint error: ' + res.status + ' ' + text);
-  }
-  return res;
+  return sendOrderEmail(order);
 }
 
 /* ===========================
@@ -585,24 +695,20 @@ function resendInvoice(){
   const history = JSON.parse(localStorage.getItem('orders') || '[]');
   if (!history.length){ alert('No invoice to resend'); return; }
   const last = history[history.length-1];
-  // try email send again
-  // adapt last object shape to expected 'order' format
   const order = last;
   (async()=>{
-    try{
-      if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
-        await sendViaEmailJS(order);
-        alert('Resent via EmailJS');
-      } else if (FORM_ENDPOINT && FORM_ENDPOINT.trim()) {
-        await sendViaFormEndpoint(order);
-        alert('Resent via form endpoint');
-      } else alert('No email sender configured.');
-    }catch(e){ console.error(e); alert('Resend failed'); }
+    try {
+      await sendOrderEmail(order);
+      alert('Resent successfully (method logged in console).');
+    } catch(e){
+      console.error(e);
+      alert('Resend failed. Check console for details.');
+    }
   })();
 }
 
 /* ===========================
-   Posts & Admin (same as before)
+   Posts & Admin
    ============================ */
 function openAdmin(){ document.getElementById('adminModal').style.display='flex'; }
 function closeAdmin(){ document.getElementById('adminModal').style.display='none'; }
